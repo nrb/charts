@@ -1,12 +1,13 @@
 # Velero -server
 
-This helm chart installs Velero  version v0.10.1
-https://github.com/heptio/velero/tree/v0.10.1
+This helm chart installs Velero version v0.11.0
+https://github.com/heptio/velero/tree/v0.11.0
 
-## Upgrading to v0.10
+## Upgrading to v0.11
 
-Velero  v0.10.1 introduces breaking changes. The below instructions are based on the [official upgrade guide](https://github.com/heptio/velero/blob/master/docs/upgrading-to-v0.10.md).
+Velero v0.11.0 introduces breaking changes. The below instructions are based on the [official upgrade guide](https://heptio.github.io/velero/v0.11.0/migrating-to-velero).
 
+## TODO ##
 1. Pull the latest changes in this chart. If you're using Helm dependencies, update the chart version you're using in your `requirements.yaml` and run `helm dependency update`.
 
 2. Scale down
@@ -26,7 +27,7 @@ helm upgrade --force --namespace velero velero ./velero
 ## Prerequisites
 
 ### Secret for cloud provider credentials
-Velero  server needs an IAM service account in order to run, if you don't have it you must create it.
+Velero server needs an IAM service account in order to run, if you don't have it you must create it.
 Please follow the official documentation: https://heptio.github.io/velero/v0.10.0/install-overview
 
 Don't forget the step to create the secret
@@ -45,9 +46,9 @@ See here for the official documentation https://heptio.github.io/velero/v0.10.0/
 | `region`             | AWS region                                                                                                                                                                    | `nil`   | only if using AWS               |
 | `apitimeout`         | Api Timeout                                                                                                                                                                   | `nil`   | only if using Azure             |
 | `credentials`        | Credentials                                                                                                                                                                   | `nil`   | Yes (not required for kube2iam) |
-| `backupSyncPeriod`   | How frequently Velero  queries the object storage to make sure that the appropriate Backup resources have been created for existing backup files.                             | `60m`   | yes                             |
-| `gcSyncPeriod`       | How frequently Velero  queries the object storage to delete backup files that have passed their TTL.                                                                          | `60m`   | yes                             |
-| `scheduleSyncPeriod` | How frequently Velero  checks its Schedule resource objects to see if a backup needs to be initiated                                                                          | `1m`    | yes                             |
+| `backupSyncPeriod`   | How frequently Velero queries the object storage to make sure that the appropriate Backup resources have been created for existing backup files.                              | `60m`   | yes                             |
+| `gcSyncPeriod`       | How frequently Velero queries the object storage to delete backup files that have passed their TTL.                                                                           | `60m`   | yes                             |
+| `scheduleSyncPeriod` | How frequently Velero checks its Schedule resource objects to see if a backup needs to be initiated                                                                           | `1m`    | yes                             |
 | `restoreOnlyMode`    | When RestoreOnly mode is on, functionality for backups, schedules, and expired backup deletion is turned off. Restores are made from existing backup files in object storage. | `false` | yes                             |
 
 | Parameter                                                     | Description                                                                                                                                                                  | Default                                                                                                   |
@@ -55,7 +56,7 @@ See here for the official documentation https://heptio.github.io/velero/v0.10.0/
 | `image.repository`                                            | Image repository                                                                                                                                                             | `gcr.io/heptio-images/velero`                                                                             |
 | `image.tag`                                                   | Image tag                                                                                                                                                                    | `v0.9.1`                                                                                                  |
 | `image.pullPolicy`                                            | Image pull policy                                                                                                                                                            | `IfNotPresent`                                                                                            |
-| `podAnnotations`                                              | Annotations for the Velero  server pod                                                                                                                                       | `{}`                                                                                                      |
+| `podAnnotations`                                              | Annotations for the Velero server pod                                                                                                                                        | `{}`                                                                                                      |
 | `rbac.create`                                                 | If true, create and use RBAC resources                                                                                                                                       | `true`                                                                                                    |
 | `rbac.server.serviceAccount.create`                           | Whether a new service account name that the server will use should be created                                                                                                | `true`                                                                                                    |
 | `rbac.server.serviceAccount.name`                             | Service account to be used for the server. If not set and `rbac.server.serviceAccount.create` is `true` a name is generated using the fullname template                      | ``                                                                                                        |
@@ -70,7 +71,7 @@ See here for the official documentation https://heptio.github.io/velero/v0.10.0/
 | `configuration.backupStorageLocation.config.s3Url`            | S3 url (primarily used for local storage services like Minio)                                                                                                                | ``                                                                                                        |
 | `configuration.backupStorageLocation.config.kmsKeyId`         | KMS key for encryption (AWS only)                                                                                                                                            | ``                                                                                                        |
 | `configuration.backupStorageLocation.prefix`                  | The directory inside a storage bucket where backups are to be uploaded                                                                                                       | ``                                                                                                        |
-| `configuration.backupSyncPeriod`                              | How frequently Velero  queries the object storage to make sure that the appropriate Backup resources have been created for existing backup files                             | `60m`                                                                                                     |
+| `configuration.backupSyncPeriod`                              | How frequently Velero queries the object storage to make sure that the appropriate Backup resources have been created for existing backup files                              | `60m`                                                                                                     |
 | `configuration.extraEnvVars`                                  | Key/values for extra environment variables such as AWS_CLUSTER_NAME, etc                                                                                                     | `{}`                                                                                                      |
 | `configuration.provider`                                      | The name of the cloud provider where you are deploying velero to (`aws`, `azure`, `gcp`)                                                                                     |                                                                                                           |
 | `configuration.restoreResourcePriorities`                     | An ordered list that describes the order in which Kubernetes resource objects should be restored                                                                             | `namespaces,persistentvolumes,persistentvolumeclaims,secrets,configmaps,serviceaccounts,limitranges,pods` |
@@ -95,4 +96,4 @@ helm install --name velero --namespace velero ./velero
 ```
 
 ## Remove heptio/velero
-Remember that when you remove Velero  all backups remain untouched
+Remember that when you remove Velero all backups remain untouched
