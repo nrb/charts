@@ -83,7 +83,7 @@ spec:
             - name: GOOGLE_APPLICATION_CREDENTIALS
           {{- end }}
               value: /credentials/cloud
-            - name: ARK_SCRATCH_DIR
+            - name: VELERO_SCRATCH_DIR
               value: /scratch
           {{ if .Values.configuration.extraEnvVars }}
           {{- range $key, $value := .Values.configuration.extraEnvVars }}
