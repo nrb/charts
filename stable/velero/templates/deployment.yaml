@@ -61,11 +61,6 @@ spec:
             - --restore-resource-priorities={{ . }}
             {{- end }}
           {{- end }}
-          {{- if eq $provider "azure" }}
-          envFrom:
-            - secretRef:
-                name: {{ include "velero.secretName" . }}
-          {{- end }}
           {{- with .Values.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
@@ -73,16 +68,18 @@ spec:
           volumeMounts:
             - name: plugins
               mountPath: /plugins
-        {{- if and .Values.credentials.useSecret (or (eq $provider "aws") (eq $provider "gcp")) }}
+        {{- if .Values.credentials.useSecret }}
             - name: cloud-credentials
               mountPath: /credentials
             - name: scratch
               mountPath: /scratch
           env:
-          {{- if eq $provider "aws" }}
+          {{- if or (eq $provider "aws") (eq $provider "minio") }}
             - name: AWS_SHARED_CREDENTIALS_FILE
-          {{- else }}
+          {{- else if eq $provider "gcp" }}
             - name: GOOGLE_APPLICATION_CREDENTIALS
+          {{- else if eq $provider "azure" }}
+            - name: AZURE_CREDENTIALS_FILE
           {{- end }}
               value: /credentials/cloud
             - name: VELERO_SCRATCH_DIR
@@ -99,7 +96,7 @@ spec:
         {{- toYaml .Values.initContainers | nindent 8 }}
 {{- end }}
       volumes:
-        {{- if and .Values.credentials.useSecret (or (eq $provider "aws") (eq $provider "gcp")) }}
+        {{- if and .Values.credentials.useSecret }}
         - name: cloud-credentials
           secret:
             secretName: {{ include "velero.secretName" . }}

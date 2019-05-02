@@ -32,7 +32,7 @@ spec:
       securityContext:
         runAsUser: 0
       volumes:
-        {{- if and .Values.credentials.useSecret (or (eq $provider "aws") (eq $provider "gcp")) }}
+        {{- if and .Values.credentials.useSecret }}
         - name: cloud-credentials
           secret:
             secretName: {{ include "velero.secretName" . }}
@@ -52,7 +52,7 @@ spec:
             - restic
             - server
           volumeMounts:
-            {{- if and .Values.credentials.useSecret (or (eq $provider "aws") (eq $provider "gcp")) }}
+            {{- if .Values.credentials.useSecret }}
             - name: cloud-credentials
               mountPath: /credentials
             {{- end }}
@@ -61,11 +61,6 @@ spec:
               mountPropagation: HostToContainer
             - name: scratch
               mountPath: /scratch
-          {{- if and .Values.credentials.useSecret (eq $provider "azure") }}
-          envFrom:
-            - secretRef:
-                name: {{ include "velero.secretName" . }}
-          {{- end }}
           env:
             - name: VELERO_NAMESPACE
               valueFrom:
@@ -77,18 +72,14 @@ spec:
                   fieldPath: spec.nodeName
             - name: VELERO_SCRATCH_DIR
               value: /scratch
-            {{- if eq $provider "aws" }}
+            {{- if or (eq $provider "aws") (eq $provider "minio") }}
             - name: AWS_SHARED_CREDENTIALS_FILE
-              value: /credentials/cloud
-            {{- end }}
-            {{- if eq $provider "gcp" }}
+            {{- else if eq $provider "gcp" }}
             - name: GOOGLE_APPLICATION_CREDENTIALS
-              value: /credentials/cloud
+            {{- else if eq $provider "azure" }}
+              - name: AZURE_CREDENTIALS_FILE
             {{- end }}
-            {{- if eq $provider "minio" }}
-            - name: AWS_SHARED_CREDENTIALS_FILE
-              value: /credentials/cloud
-            {{- end }}
+                value: /credentials/cloud
           {{- with .Values.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
